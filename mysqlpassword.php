@@ -7,5 +7,6 @@ $servername="localhost" ;
 $dbase="{mysql database name}" ;
 $imap_user="{email address for imap}";
 $imap_password="{email password}";
+$tech_emails = "dan.vogel@example.com, support@example.com";
 
 ?>
