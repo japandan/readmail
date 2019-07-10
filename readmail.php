@@ -1,5 +1,9 @@
 <?php
 
+php include("mysqlpassword.php");
+$db_password = PASSWORD;  //defined in secretInfo.php
+$db_username = USERNAME;
+
 /*  Change the date from 21/12/2017 05:00:00 GMT  to YYYY-MM-DD  */
 function fixdate($date_time) {
         if (preg_match('@(?P<DD>\d\d)/(?P<MM>\d\d)/(?P<YYYY>\d+)\b@',$date_time,$matches)){
