@@ -1,8 +1,10 @@
 <?php
 
 php include("mysqlpassword.php");
-$db_password = PASSWORD;  //defined in secretInfo.php
-$db_username = USERNAME;
+$password = PASSWORD;  //defined in secretInfo.php
+$username = USERNAME;
+$servername = SERVERNAME;
+$dbname = DATABASE;
 
 /*  Change the date from 21/12/2017 05:00:00 GMT  to YYYY-MM-DD  */
 function fixdate($date_time) {
@@ -11,7 +13,6 @@ function fixdate($date_time) {
                 return $fixed;
         }
 }
-
 
 
 
@@ -34,11 +35,8 @@ function grep( $search, $text ) {
 
 //  retrieve the list of tech emails from the SITES-TECHS table
 function send_emails( $location, $ticket, $msg ) {
+        echo "in function sendmails, username is $username";
 
-        $servername = "localhost";
-        $username = "root";
-        $password = "{PASSWORD}";
-        $dbname = "wordpress";
         $headers = "From: call.log@example.com";
         $tech_emails = "support@example.com, tester@example.com";
         $db = new mysqli($servername, $username, $password, $dbname);
@@ -64,10 +62,6 @@ function send_emails( $location, $ticket, $msg ) {
 /*  update table multi_esp_incidents columns tasknumber, status
 */
 function dbupdate( $tasknumber, $status ){
-        $servername = "localhost";
-        $username = "root";
-        $password = "{PASSWORD}";
-        $dbname = "wordpress";
 
 /* open the database  */
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -91,10 +85,6 @@ function dbupdate( $tasknumber, $status ){
 /*  insert the table multi_esp_incidents columns tasknumber, status, contract
 */
 function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
-        $servername = "localhost";
-        $username = "root";
-        $password = "{PASSWORD}";
-        $dbname = "wordpress";
 
 /*  variables pulled from text  */
         $location = rtrim( grep("City:", $text) );
