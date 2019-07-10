@@ -1,10 +1,7 @@
 <?php
+/* update this file with the database and imap login credentials */
+require('./mysqlpassword.php');
 
-include("mysqlpassword.php");
-$password = PASSWORD;  //defined in secretInfo.php
-$username = USERNAME;
-$servername = SERVERNAME;
-$dbname = DATABASE;
 
 /*  Change the date from 21/12/2017 05:00:00 GMT  to YYYY-MM-DD  */
 function fixdate($date_time) {
@@ -13,6 +10,7 @@ function fixdate($date_time) {
                 return $fixed;
         }
 }
+
 
 
 
@@ -35,25 +33,25 @@ function grep( $search, $text ) {
 
 //  retrieve the list of tech emails from the SITES-TECHS table
 function send_emails( $location, $ticket, $msg ) {
-        echo "in function sendmails, username is $username";
+        global $dbname, $username, $password, $servername, $tech_emails, $imap_user;
 
-        $headers = "From: call.log@example.com";
-        $tech_emails = "support@example.com, tester@example.com";
         $db = new mysqli($servername, $username, $password, $dbname);
         if ($db->connect_error)
                 die("DB Connection failed: ".$db->connect_error);
 
         $sql="SELECT * FROM multi_sites_techs WHERE site = '$location'";
+        //$sql="UPDATE multi_sites_techs SET tech_email = CONCAT(tech,'@datostech.com') ";
+        $headers = "From: $imap_user";
         $email_group = $db->query( $sql );
         if ($email_group->num_rows > 0)  {
                 while ($row = $email_group->fetch_assoc()) {
                         $tech_emails = $tech_emails.",".$row["tech_email"];
                 }
-                mail($tech_emails, "NEW Ticket $ticket for '$location'", $msg, $headers);
+                mail($tech_emails, "NEW ESP Ticket $ticket for '$location'", $msg, $headers);
                 echo "\nSending emails to techs found for location '$location'";
                 echo $tech_emails;
         } else {
-                mail($tech_emails, "NEW Ticket $ticket  UNKNOWN LOCATION '$location'", "PLEASE FORWARD TO CORRECT TECHS!!\n".$msg, $headers);
+                mail($tech_emails, "NEW ESP Ticket $ticket  UNKNOWN LOCATION '$location'", "PLEASE FORWARD TO CORRECT TECHS!!\n".$msg, $headers);
                 echo "\nSending emails to managers.  No techs emails found for location '$location'";
         }
 
@@ -63,6 +61,7 @@ function send_emails( $location, $ticket, $msg ) {
 */
 function dbupdate( $tasknumber, $status ){
 
+        global $dbname, $username, $password, $servername;
 /* open the database  */
         $conn = new mysqli($servername, $username, $password, $dbname);
         if ($conn->connect_error)
@@ -85,6 +84,7 @@ function dbupdate( $tasknumber, $status ){
 /*  insert the table multi_esp_incidents columns tasknumber, status, contract
 */
 function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
+        global $dbname, $username, $password, $servername;
 
 /*  variables pulled from text  */
         $location = rtrim( grep("City:", $text) );
@@ -166,8 +166,6 @@ SHIPPED TO: Darrick Haynes
 Product: LENOV-2347-7CD
 Serial Number : MJXBWXK
 Customer / Site ID: EA88474600190
-Onsite Contact Name : Dallas Lewis
-Caller Name : Dallas Lewis
 Address: YOKOSUKA NAVAL BASE
 City: YOKOSUKA
 
@@ -198,7 +196,7 @@ table: multi_esp_incidents
         location <-- from message body..city?
         summary  <- from message body
         caller  <-- from message body
-        closedon <-- from CALL_LOG when tech closes or Import from Ticket portal
+        closedon <-- from CALL_LOG when tech closes or Import from ESP portal
         contactphone  <-- from message body
         receivedon:date <-- date email comes in
         respondby:date <-- from message body
@@ -207,7 +205,9 @@ table: multi_esp_incidents
 
 
 /*  open the mailbox  */
-        $imap = imap_open("{example.com:143}", "call.log@example.com", "{PASSWORD}");
+        echo "checking mail on $imap_server for account: $imap_user \n\n";
+        $imap = imap_open( $imap_server, "$imap_user", "$imap_password" );
+/*        $imap = imap_open("{datostech.com:143}", "call.log@datostech.com", "RHCSA2017!");*/
 
         $message_count = imap_num_msg($imap);
         echo "Messages:".$message_count."\n\n";
