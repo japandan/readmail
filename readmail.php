@@ -1,6 +1,6 @@
 <?php
 
-php include("mysqlpassword.php");
+include("mysqlpassword.php");
 $password = PASSWORD;  //defined in secretInfo.php
 $username = USERNAME;
 $servername = SERVERNAME;
