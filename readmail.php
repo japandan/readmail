@@ -1,3 +1,24 @@
+<!-
+The following script is used to check an imap email account and process the emails.  I use this script 
+to read emails comming from ServiceNow helpdesk ticket system.  The script will read each new email and look
+for the "location:" field.  It will then check a MySQL table to see what tech email addresses are used for the
+location.  It will forward the new email to these techs.  
+
+This script can be executed via the web or via a cron job.  I currently have a cron.daily job 
+that executes the script every hour.    
+
+This is what is done when the script runs:
+	1.  Checks the email account for headers from new email.  
+	2.  Looks for an NEW INCIDENT# in the email. If found, it realizes the email is for a new Ticket.
+	3.  If the ticket is new, a record is inserted into the CALL_LOG database and status set to OPEN.
+	4.  The email is parsed for the LOCATION city.
+	5.  The LOCATION is looked up in a simple MySQL table that has LOCATION:EMAIL@example.com for each tech.
+	6.  The email is forwarded to each tech email.
+	7.  In ALL cases, the email is moved from the INBOX to a folder called "Processed".
+
+
+-->
+
 <?php
 /* update this file with the database and imap login credentials */
 require('/var/www/mysqlpassword.php');
