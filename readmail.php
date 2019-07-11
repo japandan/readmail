@@ -1,6 +1,6 @@
 <?php
 /* update this file with the database and imap login credentials */
-require('./mysqlpassword.php');
+require('/var/www/mysqlpassword.php');
 
 
 /*  Change the date from 21/12/2017 05:00:00 GMT  to YYYY-MM-DD  */
