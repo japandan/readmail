@@ -1,4 +1,6 @@
 # readmail
+Requires: yum install php73-php-imap 
+
 PHP Script to read mail from an imap account and forward to techs at locations based on contents of mail
 The script will also open a database and update a ticket status to OPEN or CLOSED depending on what is written in the email it reads.
 
