@@ -4,7 +4,7 @@
 $password="{mysql password}";
 $username="{mysql username}";
 $servername="localhost" ;
-$dbase="{mysql database name}" ;
+$dbname="{mysql database name}" ;
 
 $imap_server="{example.com:143}";
 $imap_user="email address for imap";
