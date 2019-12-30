@@ -59,13 +59,13 @@ function grep( $search, $text ) {
 
 //  retrieve the list of tech emails from the SITES-TECHS table
 function send_emails( $location, $ticket, $msg ) {
-        global $dbname, $username, $password, $servername, $tech_emails, $imap_user;
+        global $dbname, $username, $password, $servername, $tech_emails, $imap_user, $sites_techs;
 
         $db = new mysqli($servername, $username, $password, $dbname);
         if ($db->connect_error)
                 die("DB Connection failed: ".$db->connect_error);
 
-        $sql="SELECT * FROM esp_sites_techs WHERE site = '$location'";
+        $sql="SELECT * FROM $sites_techs WHERE site = '$location'";
         //$sql="UPDATE esp_sites_techs SET tech_email = CONCAT(tech,'@datostech.com') ";
         $headers = "From: $imap_user";
         $email_group = $db->query( $sql );
@@ -87,13 +87,13 @@ function send_emails( $location, $ticket, $msg ) {
 */
 function dbupdate( $tasknumber, $status ){
 
-        global $dbname, $username, $password, $servername;
+        global $dbname, $username, $password, $servername, $incidents;
 /* open the database  */
         $conn = new mysqli($servername, $username, $password, $dbname);
         if ($conn->connect_error)
                 die("DB Connection failed: ".$conn->connect_error);
 
-        $sql ="UPDATE esp_incidents SET status='$status' WHERE tasknumber = '$tasknumber'";
+        $sql ="UPDATE $incidents SET status='$status' WHERE tasknumber = '$tasknumber'";
         if ($conn->query($sql) === TRUE) {
                 echo "Ticket $tasknumber changed to status=$status \n\n"; }
         else {
@@ -110,7 +110,7 @@ function dbupdate( $tasknumber, $status ){
 /*  insert the table esp_incidents columns tasknumber, status, contract
 */
 function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
-        global $dbname, $username, $password, $servername;
+        global $dbname, $username, $password, $servername, $incidents;
 
 /*  variables pulled from text  */
         $location = rtrim( grep("City:", $text) );
@@ -133,7 +133,7 @@ function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
                 die("DB Connection failed: ".$conn->connect_error);
 
 
-        $sql ="INSERT INTO esp_incidents (tasknumber, status, contract,
+        $sql ="INSERT INTO $incidents (tasknumber, status, contract,
          location, summary, caller, contactphone, receivedon, respondby,
          restoreby,address, alternate_contact ) VALUES
         ( '$tasknumber','$status','$contract','$location','$summary','$caller',
@@ -233,7 +233,7 @@ table: esp_incidents
 /*  open the mailbox  */
         echo "checking mail on $imap_server for account: $imap_user \n\n";
         $imap = imap_open( $imap_server, "$imap_user", "$imap_password" );
-/*        $imap = imap_open("{datostech.com:143}", "call.log@datostech.com", "RHCSA2017!");*/
+/*        $imap = imap_open("{datostech.com:143}", "call.log@datostech.com", "imap-password");*/
 
         $message_count = imap_num_msg($imap);
         echo "Messages:".$message_count."\n\n";
