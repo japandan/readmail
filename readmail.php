@@ -23,6 +23,11 @@ This is what is done when the script runs:
 /* update this file with the database and imap login credentials */
 require('/var/www/mysqlpassword.php');
 
+// exit if imap is not installed in PHP
+echo "imap module: ", extension_loaded('imap') ? 'OK' : 'MISSING', "\n<br>";
+echo "";
+if ( ! extension_loaded('imap') ) { echo "install php_imap\n"; exit(); }
+
 
 /*  Change the date from 21/12/2017 05:00:00 GMT  to YYYY-MM-DD  */
 function fixdate($date_time) {
@@ -60,8 +65,8 @@ function send_emails( $location, $ticket, $msg ) {
         if ($db->connect_error)
                 die("DB Connection failed: ".$db->connect_error);
 
-        $sql="SELECT * FROM multi_sites_techs WHERE site = '$location'";
-        //$sql="UPDATE multi_sites_techs SET tech_email = CONCAT(tech,'@datostech.com') ";
+        $sql="SELECT * FROM esp_sites_techs WHERE site = '$location'";
+        //$sql="UPDATE esp_sites_techs SET tech_email = CONCAT(tech,'@datostech.com') ";
         $headers = "From: $imap_user";
         $email_group = $db->query( $sql );
         if ($email_group->num_rows > 0)  {
@@ -78,7 +83,7 @@ function send_emails( $location, $ticket, $msg ) {
 
 }
 
-/*  update table multi_esp_incidents columns tasknumber, status
+/*  update table esp_incidents columns tasknumber, status
 */
 function dbupdate( $tasknumber, $status ){
 
@@ -88,7 +93,7 @@ function dbupdate( $tasknumber, $status ){
         if ($conn->connect_error)
                 die("DB Connection failed: ".$conn->connect_error);
 
-        $sql ="UPDATE multi_esp_incidents SET status='$status' WHERE tasknumber = '$tasknumber'";
+        $sql ="UPDATE esp_incidents SET status='$status' WHERE tasknumber = '$tasknumber'";
         if ($conn->query($sql) === TRUE) {
                 echo "Ticket $tasknumber changed to status=$status \n\n"; }
         else {
@@ -102,7 +107,7 @@ function dbupdate( $tasknumber, $status ){
 
 
 
-/*  insert the table multi_esp_incidents columns tasknumber, status, contract
+/*  insert the table esp_incidents columns tasknumber, status, contract
 */
 function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
         global $dbname, $username, $password, $servername;
@@ -128,7 +133,7 @@ function dbinsert( $tasknumber, $status, $contract, $receivedon, $text ){
                 die("DB Connection failed: ".$conn->connect_error);
 
 
-        $sql ="INSERT INTO multi_esp_incidents (tasknumber, status, contract,
+        $sql ="INSERT INTO esp_incidents (tasknumber, status, contract,
          location, summary, caller, contactphone, receivedon, respondby,
          restoreby,address, alternate_contact ) VALUES
         ( '$tasknumber','$status','$contract','$location','$summary','$caller',
@@ -209,7 +214,7 @@ Number: ITSK0279360
 
 ------------------------------------------------ end of email ----------
 Database to store the headers..
-table: multi_esp_incidents
+table: esp_incidents
         tasknumber  <-- message header
         status   <-- open, closed, logged
         contract <-- DoDEA, etc
@@ -253,8 +258,8 @@ table: multi_esp_incidents
 /* read subject and body text and insert into db */
                 addtodb( $subject, $prettydate, $message_text );
 /* move email to the "Processed Folder"  */
-                imap_mail_move($imap,$i,'processed');
-                echo "$subject  (moved to processed mailbox.)";
+//                imap_mail_move($imap,$i,'processed');
+//                echo "$subject  (moved to processed mailbox.)";
                 echo "<br><br>\n\n";
         }
 
